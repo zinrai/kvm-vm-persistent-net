@@ -11,6 +11,13 @@ import (
 	"strings"
 )
 
+// Injected at build time via goreleaser ldflags
+var (
+	version = "dev"
+	commit  = "none"
+	date    = "unknown"
+)
+
 // network interface from virsh XML
 type Interface struct {
 	Mac struct {
@@ -26,13 +33,19 @@ type Domain struct {
 func main() {
 	// Define command line flags
 	help := flag.Bool("help", false, "Display help information")
+	showVersion := flag.Bool("version", false, "Display version information")
 	dryRun := flag.Bool("dry-run", false, "Show the rules file contents without copying to VM")
 	prefix := flag.String("prefix", "eth", "Interface name prefix")
 	startIndex := flag.Int("start-index", 0, "Starting index for interface numbering")
 	ruleName := flag.String("rule-name", "70-persistent-net.rules", "Filename for the udev rules")
-	verbose := flag.Bool("verbose", false, "Display verbose output")
 
 	flag.Parse()
+
+	// Display version if requested
+	if *showVersion {
+		fmt.Printf("kvm-vm-persistent-net %s (commit: %s, built: %s)\n", version, commit, date)
+		return
+	}
 
 	// Display help if requested
 	if *help {
@@ -49,9 +62,7 @@ func main() {
 	}
 	vmName := args[0]
 
-	if *verbose {
-		fmt.Printf("Processing VM: %s\n", vmName)
-	}
+	fmt.Printf("Processing VM: %s\n", vmName)
 
 	// Check if VM exists and is shut off
 	if err := checkVMStatus(vmName); err != nil {
@@ -71,9 +82,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	if *verbose {
-		fmt.Printf("Found %d network interfaces\n", len(macAddresses))
-	}
+	fmt.Printf("Found %d network interfaces\n", len(macAddresses))
 
 	// Generate udev rules file
 	rulesFile, err := generateRulesFile(macAddresses, vmName, *prefix, *startIndex, *ruleName)

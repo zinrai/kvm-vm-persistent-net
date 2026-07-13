@@ -19,12 +19,6 @@ This tool is particularly useful for virtual machines with multiple network inte
 - `libguestfs-tools` package (for `virt-copy-in`)
 - Sudo privileges
 
-## Installation
-
-```bash
-$ go build
-```
-
 ## Usage
 
 ```bash
@@ -39,11 +33,11 @@ $ kvm-vm-persistent-net [flags] <vm-name>
 
 Available flags:
 - `--help`: Display help information
+- `--version`: Display version information
 - `--dry-run`: Show the rules file contents without copying to VM
 - `--prefix`: Interface name prefix (default: "eth")
 - `--start-index`: Starting index for interface numbering (default: 0)
 - `--rule-name`: Filename for the udev rules (default: "70-persistent-net.rules")
-- `--verbose`: Display verbose output
 
 ### Examples
 
